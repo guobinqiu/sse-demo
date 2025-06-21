@@ -1,10 +1,21 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 )
+
+type Message struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+type StreamRequest struct {
+	Model    string    `json:"model"`
+	Messages []Message `json:"messages"`
+}
 
 func streamHandler(w http.ResponseWriter, r *http.Request) {
 	// 限制只接受 POST 请求
@@ -16,7 +27,8 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 	// 设置响应头，启用 SSE
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Connection", "close")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	flusher, ok := w.(http.Flusher)
 	if !ok {
@@ -24,11 +36,21 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 获取请求上下文
+	// 解析 JSON 请求体
+	var reqData StreamRequest
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&reqData); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("收到请求:", reqData.Messages[0].Content)
+
+	// 处理客户端断连
 	ctx := r.Context()
 
 	// 模拟数据生成
-	data := []string{"Hello", "World", "This is a stream!"}
+	data := []string{"Hi", "there", "!", "How", "can", "I", "help", "you", "today", "?", "😊"}
 
 	for _, msg := range data {
 		select {
@@ -38,7 +60,7 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 		default:
 			fmt.Fprintf(w, "data: %s\n\n", msg)
 			flusher.Flush() // 立即发送到客户端
-			time.Sleep(1 * time.Second)
+			time.Sleep(300 * time.Millisecond)
 		}
 	}
 

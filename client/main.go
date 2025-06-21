@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -14,12 +16,24 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	go func() {
-		time.Sleep(2 * time.Second)
-		cancel()
-	}()
+	// go func() {
+	// 	time.Sleep(2 * time.Second)
+	// 	cancel()
+	// }()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", "http://localhost:8080/stream", nil)
+	data := map[string]any{
+		"model": "gpt-4",
+		"messages": []map[string]string{
+			{"role": "user", "content": "Hi"},
+		},
+	}
+
+	jsonBytes, err := json.Marshal(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", "http://localhost:8080/stream", bytes.NewBuffer(jsonBytes))
 	if err != nil {
 		log.Fatal(err)
 	}
