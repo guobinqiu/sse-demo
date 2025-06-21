@@ -17,6 +17,25 @@ type StreamRequest struct {
 	Messages []Message `json:"messages"`
 }
 
+// 模拟OpenAI返回的结构体
+type ChoiceDelta struct {
+	Content string `json:"content,omitempty"`
+}
+
+type Choice struct {
+	Delta        ChoiceDelta `json:"delta"`
+	Index        int         `json:"index"`
+	FinishReason *string     `json:"finish_reason"` // 用指针区分null
+}
+
+type OpenAIStreamResp struct {
+	ID      string   `json:"id"`
+	Object  string   `json:"object"`
+	Created int64    `json:"created"`
+	Model   string   `json:"model"`
+	Choices []Choice `json:"choices"`
+}
+
 func streamHandler(w http.ResponseWriter, r *http.Request) {
 	// 限制只接受 POST 请求
 	if r.Method != http.MethodPost {
