@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -15,25 +16,6 @@ type Message struct {
 type StreamRequest struct {
 	Model    string    `json:"model"`
 	Messages []Message `json:"messages"`
-}
-
-// 模拟OpenAI返回的结构体
-type ChoiceDelta struct {
-	Content string `json:"content,omitempty"`
-}
-
-type Choice struct {
-	Delta        ChoiceDelta `json:"delta"`
-	Index        int         `json:"index"`
-	FinishReason *string     `json:"finish_reason"` // 用指针区分null
-}
-
-type OpenAIStreamResp struct {
-	ID      string   `json:"id"`
-	Object  string   `json:"object"`
-	Created int64    `json:"created"`
-	Model   string   `json:"model"`
-	Choices []Choice `json:"choices"`
 }
 
 func streamHandler(w http.ResponseWriter, r *http.Request) {
@@ -69,17 +51,17 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	// 模拟数据生成
-	data := []string{"Hi", "there", "!", "How", "can", "I", "help", "you", "today", "?", "😊"}
+	words := strings.Split("Hi there! How can I help you today? 😊", " ")
 
-	for _, msg := range data {
+	for _, word := range words {
 		select {
 		case <-ctx.Done():
 			fmt.Println("客户端取消连接")
 			return
 		default:
-			fmt.Fprintf(w, "data: %s\n\n", msg)
+			fmt.Fprintf(w, "data: %s\n\n", word)
 			flusher.Flush() // 立即发送到客户端
-			time.Sleep(300 * time.Millisecond)
+			time.Sleep(200 * time.Millisecond)
 		}
 	}
 
