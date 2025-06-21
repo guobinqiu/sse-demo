@@ -44,6 +44,7 @@ func main() {
 	}
 	defer resp.Body.Close()
 
+	// 逐行读取 HTTP 响应体中的内容
 	scanner := bufio.NewScanner(resp.Body)
 
 	// 当 ctx 被取消导致底层连接关闭或读取中断时，scanner.Scan() 会返回 false，从而自动跳出循环
