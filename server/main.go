@@ -7,6 +7,12 @@ import (
 )
 
 func streamHandler(w http.ResponseWriter, r *http.Request) {
+	// 限制只接受 POST 请求
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	// 设置响应头，启用 SSE
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")

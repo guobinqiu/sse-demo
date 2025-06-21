@@ -19,7 +19,7 @@ func main() {
 		cancel()
 	}()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/stream", nil)
+	req, err := http.NewRequestWithContext(ctx, "POST", "http://localhost:8080/stream", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
