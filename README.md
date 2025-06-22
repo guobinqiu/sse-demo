@@ -25,8 +25,10 @@ F12查看Console
 
 第二步:
 
+in another terminal
+
 ```
-go run server/standard-sse-retrylimit/main.go (in another terminal)
+go run server/standard-sse-retrylimit/main.go
 ```
 再次刷新浏览器
 
