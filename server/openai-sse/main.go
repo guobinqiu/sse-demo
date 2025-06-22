@@ -79,7 +79,6 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// 发送结束信号
 	finishReason := "stop"
 	finalChunk := model.StreamChunk{
 		ID:      "chatcmpl-123",
@@ -101,7 +100,12 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 发送 finish_reason stop 的 chunk
 	fmt.Fprintf(w, "data: %s\n\n", jsonBytes)
+	flusher.Flush()
+
+	// 发送流结束标志 [DONE]
+	fmt.Fprintf(w, "data: [DONE]\n\n")
 	flusher.Flush()
 }
 
