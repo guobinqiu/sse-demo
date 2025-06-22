@@ -32,27 +32,30 @@ go run server/standard-sse-retrylimit/main.go (in another terminal)
 
 测试类openai的非标sse
 
-### 测试正常
+### 测正常
 
 ```
-go run server/openai-sse/main.go
-go run client/openai-sse/main.go (in another terminal)
+go test -v ./server/openai-sse -run '^TestOpenaiSSE$'
 ```
 
-### 测试异常
+### 测异常
 
-#### 客户端取消
-
-```
-go run server/openai-sse/main.go
-go run client/openai-sse-req-cancel/main.go (in another terminal)
-```
-
-#### 客户端超时
+#### 取消
 
 ```
-go run server/openai-sse/main.go
-go run client/openai-sse-req-timeout/main.go (in another terminal)
+go test -v ./server/openai-sse -run '^TestOpenaiSSEReqCancel$'
+```
+
+#### 超时
+
+```
+go test -v ./server/openai-sse -run '^TestOpenaiSSEReqTimeout$'
+```
+
+#### 超时
+
+```
+go test -v ./server/openai-sse -run '^TestOpenaiSSEReqTimeout$'
 ```
 
 ## 概念对比
