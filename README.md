@@ -2,7 +2,7 @@
 
 ## standard-sse
 
-测试标准sse
+测标准sse
 
 ```
 go run server/standard-sse/main.go
@@ -11,7 +11,7 @@ http://localhost:8080/
 
 ## standard-sse-retrylimit
 
-测试限制重试次数的标准sse
+测限制重试次数的标准sse
 
 第一步:
 
@@ -30,7 +30,7 @@ go run server/standard-sse-retrylimit/main.go (in another terminal)
 
 ## openai-sse
 
-测试类openai的非标sse
+测类openai的非标sse
 
 ### 测正常
 
