@@ -10,22 +10,25 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/guobinqiu/sse-demo/model"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// go func() {
-	// 	time.Sleep(2 * time.Second)
-	// 	cancel()
-	// }()
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+		cancel()
+	}()
 
-	data := map[string]any{
-		"model": "gpt-4",
-		"messages": []map[string]string{
-			{"role": "user", "content": "Hi"},
+	data := model.StreamRequest{
+		Model: "gpt-4",
+		Messages: []model.Message{
+			{Role: "user", Content: "Hi"},
 		},
+		Stream: true,
 	}
 
 	jsonBytes, err := json.Marshal(data)
@@ -33,7 +36,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", "http://localhost:8080/stream", bytes.NewBuffer(jsonBytes))
+	req, err := http.NewRequestWithContext(ctx, "POST", "http://localhost:8080/stream", bytes.NewReader(jsonBytes))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,11 +55,21 @@ func main() {
 		line := scanner.Text()
 		if len(line) > 6 && line[:6] == "data: " {
 			content := line[6:]
-			if content == "[DONE]" {
-				fmt.Println("收到结束标志，退出读取")
-				break
+
+			var chunk model.StreamChunk
+			if err := json.Unmarshal([]byte(content), &chunk); err != nil {
+				fmt.Println("json解析错误:", err)
+				continue
 			}
-			fmt.Println(content)
+
+			for _, choice := range chunk.Choices {
+				if choice.FinishReason != nil && *choice.FinishReason == "stop" {
+					fmt.Println("收到结束标志，退出读取")
+					break
+				}
+
+				fmt.Println(choice.Delta.Content)
+			}
 		}
 	}
 

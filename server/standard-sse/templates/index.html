@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>SSE Demo</title>
+</head>
+
+<body>
+  <div id="output"></div>
+
+  <script>
+    const output = document.getElementById("output");
+
+    const evtSource = new EventSource("http://localhost:8080/stream");
+
+    evtSource.onmessage = (event) => {
+      if (event.data === "[DONE]") {
+        evtSource.close();
+        return;
+      }
+      output.innerHTML += event.data + " ";
+    };
+  </script>
+</body>
+
+</html>

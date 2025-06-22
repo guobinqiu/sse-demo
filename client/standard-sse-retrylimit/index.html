@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>SSE Demo</title>
+</head>
+
+<body>
+  <div id="output"></div>
+
+  <script>
+    let retryCount = 0;
+    const maxRetry = 5;
+
+    const output = document.getElementById("output");
+
+    const evtSource = new EventSource("http://localhost:8080/stream");
+
+    evtSource.onopen = () => {
+      console.log("连接成功");
+      retryCount = 0; // 成功连接，重置计数
+    };
+
+    evtSource.onmessage = (event) => {
+      if (event.data === "[DONE]") {
+        evtSource.close();
+        return;
+      }
+      output.innerHTML += event.data + " ";
+    };
+
+    evtSource.onerror = (err) => {
+      retryCount++;
+      console.warn(`连接断开，重试第 ${retryCount} 次`);
+      if (retryCount > maxRetry - 1) {
+        console.error("超过最大重试次数，关闭连接");
+        evtSource.close(); // 停止重连
+      }
+    };
+  </script>
+</body>
+
+</html>
