@@ -1,5 +1,7 @@
 # SSE Demo
 
+Explore how OpenAI responds with streaming
+
 ## standard-sse
 
 测标准sse
