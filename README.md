@@ -56,12 +56,6 @@ go test -v ./server/openai-sse -run '^TestOpenaiSSEReqCancel$'
 go test -v ./server/openai-sse -run '^TestOpenaiSSEReqTimeout$'
 ```
 
-#### 超时
-
-```
-go test -v ./server/openai-sse -run '^TestOpenaiSSEReqTimeout$'
-```
-
 ## 概念对比
 
 ### SSE vs WebSocket
